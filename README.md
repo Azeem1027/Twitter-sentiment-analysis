@@ -87,7 +87,3 @@ Twitter-Sentiment-Analysis/
 | I love this product |
 | Terrible customer service |
 | Average experience |
-
-## Author
-
-Azeem Babar
