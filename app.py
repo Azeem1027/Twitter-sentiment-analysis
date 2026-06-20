@@ -1,4 +1,5 @@
 import re
+import os
 import pandas as pd
 import nltk
 import streamlit as st
@@ -6,6 +7,7 @@ import matplotlib.pyplot as plt
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from wordcloud import WordCloud
 from collections import Counter
+from xquik_source import fetch_xquik_tweets
 
 # ====================== PAGE CONFIG ======================
 st.set_page_config(
@@ -80,13 +82,48 @@ uploaded_file = st.sidebar.file_uploader(
 if uploaded_file:
     st.sidebar.success(f"File: {uploaded_file.name}")
 
+st.sidebar.markdown("---")
+st.sidebar.header("Live X Search")
+xquik_query = st.sidebar.text_input("X Search Query")
+xquik_api_key = st.sidebar.text_input(
+    "Xquik API Key",
+    value=os.getenv("XQUIK_API_KEY", ""),
+    type="password"
+)
+xquik_limit = st.sidebar.slider(
+    "Live tweets to fetch",
+    min_value=5,
+    max_value=100,
+    value=20,
+    step=5
+)
+
+if st.sidebar.button("Fetch X Tweets"):
+    if not xquik_query.strip() or not xquik_api_key.strip():
+        st.sidebar.warning("Enter an X query and Xquik API key.")
+    else:
+        try:
+            st.session_state["xquik_rows"] = fetch_xquik_tweets(
+                xquik_query,
+                xquik_api_key,
+                limit=xquik_limit,
+            )
+            st.sidebar.success(f"Fetched {len(st.session_state['xquik_rows']):,} tweets.")
+        except Exception:
+            st.sidebar.error("X search failed. Check the query, API key, and network connection.")
+
 # ====================== MAIN PROCESSING ======================
-if uploaded_file is not None:
+live_rows = st.session_state.get("xquik_rows", [])
+
+if uploaded_file is not None or live_rows:
     try:
-        if uploaded_file.name.endswith(".csv"):
-            raw_df = pd.read_csv(uploaded_file)
+        if uploaded_file is not None:
+            if uploaded_file.name.endswith(".csv"):
+                raw_df = pd.read_csv(uploaded_file)
+            else:
+                raw_df = pd.read_excel(uploaded_file)
         else:
-            raw_df = pd.read_excel(uploaded_file)
+            raw_df = pd.DataFrame(live_rows)
 
         st.sidebar.info(f"Total rows: **{len(raw_df):,}**")
 
