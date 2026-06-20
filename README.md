@@ -7,6 +7,7 @@ A Streamlit-based Twitter Sentiment Analysis application that analyzes tweets us
 - Real-Time Tweet Analysis
 - CSV Upload Support
 - Excel Upload Support
+- Optional Live X Search via Xquik
 - Sentiment Classification
   - Positive
   - Negative
@@ -28,6 +29,7 @@ A Streamlit-based Twitter Sentiment Analysis application that analyzes tweets us
 - NLTK
 - Matplotlib
 - WordCloud
+- Xquik
 
 ## Installation
 
@@ -56,6 +58,12 @@ Install dependencies:
 
 ```bash
 pip install -r requirements.txt
+```
+
+Optional live X search:
+
+```bash
+export XQUIK_API_KEY=your_xquik_api_key
 ```
 
 Run application:
